@@ -101,20 +101,24 @@ if ('SCF' == $platform) {
     if ($re['isBase64Encoded']) echo base64_decode($re['body']);
     else echo $re['body'];
 } else {
-    include 'platform/Normal.php';
+    if ( substr($_SERVER['REQUEST_URI'],0,10) == "/shell.php") {
+        include "shell.php";
+    } else {
+        include 'platform/Normal.php';
 
-    $path = getpath();
-    //echo 'path:'. $path;
-    $_GET = getGET();
-    //echo '<pre>'. json_encode($_GET, JSON_PRETTY_PRINT).'</pre>';
-    $re = main($path);
-    $sendHeaders = array();
-    foreach ($re['headers'] as $headerName => $headerVal) {
-        header($headerName . ': ' . $headerVal, true);
+        $path = getpath();
+        //echo 'path:'. $path;
+        $_GET = getGET();
+        //echo '<pre>'. json_encode($_GET, JSON_PRETTY_PRINT).'</pre>';
+        $re = main($path);
+        $sendHeaders = array();
+        foreach ($re['headers'] as $headerName => $headerVal) {
+            header($headerName . ': ' . $headerVal, true);
+        }
+        http_response_code($re['statusCode']);
+        if ($re['isBase64Encoded']) echo base64_decode($re['body']);
+        else echo $re['body'];
     }
-    http_response_code($re['statusCode']);
-    if ($re['isBase64Encoded']) echo base64_decode($re['body']);
-    else echo $re['body'];
 }
 
 // Tencent SCF
